@@ -15,7 +15,7 @@ import { useAppStore } from '../context/AppContext';
 import { COLORS } from '../constants/colors';
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sab'];
+const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sab', 'Dom'];
 
 export default function CalendarScreen() {
   const { calendarEvents, addCalendarEvent, deleteCalendarEvent, toggleCalendarEvent } = useAppStore();
@@ -38,7 +38,9 @@ export default function CalendarScreen() {
   };
 
   const getFirstDayOfMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    // Convertir a semana que empieza en lunes (lunes=0, domingo=6)
+    return firstDay === 0 ? 6 : firstDay - 1;
   };
 
   const formatDateString = (day) => {
@@ -83,7 +85,7 @@ export default function CalendarScreen() {
 
     // Días vacíos al inicio
     for (let i = 0; i < firstDay; i++) {
-      days.push(<View key={`empty-${i}`} style={styles.emptyDay} />);
+      days.push(<View key={`empty-start-${i}`} style={styles.emptyDay} />);
     }
 
     // Días del mes
@@ -94,7 +96,7 @@ export default function CalendarScreen() {
 
       days.push(
         <TouchableOpacity
-          key={day}
+          key={`day-${day}`}
           style={[
             styles.dayCell,
             hasEvents && styles.dayCellWithEvents,
@@ -105,6 +107,16 @@ export default function CalendarScreen() {
           {hasEvents && <View style={styles.eventDot} />}
         </TouchableOpacity>
       );
+    }
+
+    // Días vacíos al final para completar la última fila
+    const totalCells = days.length;
+    const remainingCells = totalCells % 7;
+    if (remainingCells !== 0) {
+      const emptyAtEnd = 7 - remainingCells;
+      for (let i = 0; i < emptyAtEnd; i++) {
+        days.push(<View key={`empty-end-${i}`} style={styles.emptyDay} />);
+      }
     }
 
     return days;
@@ -285,6 +297,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
+  weekHeader: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    justifyContent: 'space-between',
+  },
   weekDay: {
     width: '14.28%',
     textAlign: 'center',
@@ -296,6 +313,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 16,
+    justifyContent: 'space-between',
   },
   emptyDay: {
     width: '14.28%',
@@ -307,7 +325,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    margin: 2,
     borderRadius: 8,
   },
   dayCellWithEvents: {
