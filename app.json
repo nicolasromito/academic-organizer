@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Academic Organizer",
+    "slug": "academic-organizer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "academicorganizer",
+    "android": {
+      "package": "com.academicorganizer.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "49fc0e8d-7fde-4391-92fa-ba3ef4d9e282"
+      }
+    }
+  }
+}
